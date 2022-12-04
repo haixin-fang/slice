@@ -13,7 +13,8 @@
   "scripts": {
     "dev": "rollup -w -c",
     "build": "rollup -c",
-    "prepublish": "npm version && npm run build"
+    "prepublish": "npm version && npm run build",
+    "prepare": "husky install"
   },
   "keywords": [],
   "author": "",
