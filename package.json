@@ -14,7 +14,8 @@
     "dev": "rollup -w -c",
     "build": "rollup -c",
     "prepublish": "npm version && npm run build",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "commit": "git-cz"
   },
   "keywords": [],
   "author": "",
