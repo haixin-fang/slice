@@ -7,7 +7,7 @@
 		"module": "es2015",
 		"target": "es5",
 		"declaration": true,
-		"declarationDir": "./declaration",
+		"declarationDir": "./dist",
 		"experimentalDecorators": true,
 		"noUnusedLocals": true,
 		"skipLibCheck": false,

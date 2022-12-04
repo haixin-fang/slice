@@ -1,0 +1,95 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=0"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>Gesto</title>
+    <meta name="description" content="You can set up drag, pinch events in any browser." />
+    <meta name="keywords" content="gesto,javascript,gesture,pinch,drag" />
+
+    <style>
+      a {
+        text-decoration: none;
+      }
+      html,
+      body {
+        position: relative;
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: sans-serif;
+      }
+      .wrapper {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        min-height: 500px;
+      }
+      .header {
+        position: relative;
+        height: 200px;
+        width: calc(100% - 60px);
+        border-bottom: 1px solid #e5e5e5;
+        margin: auto;
+      }
+
+      #target {
+        position: absolute;
+        width: 200px;
+        height: 150px;
+        line-height: 150px;
+        background: #333;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        font-family: sans-serif;
+        text-align: center;
+        top: 50%;
+        left: 50%;
+        margin-left: -100px;
+        margin-top: -75px;
+      }
+
+      .container {
+        position: relative;
+        width: 100%;
+        padding: 10px 20px;
+        box-sizing: border-box;
+        max-width: 800px;
+        margin: auto;
+      }
+      .buttons {
+        margin: 0;
+        padding: 10px;
+      }
+
+      .buttons a {
+        margin: 0;
+        position: relative;
+        text-decoration: none;
+        color: #333;
+        border: 1px solid #333;
+        padding: 12px 30px;
+        min-width: 140px;
+        text-align: center;
+        display: inline-block;
+        box-sizing: border-box;
+        margin: 5px;
+        transition: all ease 0.5s;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script src="../dist/slice.js"></script>
+    <script>
+      debugger;
+      const a = new slice();
+    </script>
+  </body>
+</html>
