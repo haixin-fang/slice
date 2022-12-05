@@ -27,7 +27,7 @@ export const getScroll = function (scrollProp: any, offsetProp: any) {
   }
   return document.body[scrollProp];
 };
-export const getOffset = function (el: Element) {
+export const getOffset = function (el: HTMLElement) {
   const rect = el.getBoundingClientRect();
   return {
     left: rect.left + getScroll("scrollLeft", "pageXOffset"),
@@ -45,3 +45,7 @@ export function removeClass(element: Element, className: string) {
     element.className = element.className.replace(reg, " ");
   }
 }
+
+export const getCss = function (o:HTMLElement, key:string) {
+    return window.getComputedStyle(o, null)[key];
+};

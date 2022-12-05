@@ -1,5 +1,5 @@
 import { EventEmitter } from "events";
-import { isString, addEvent, createDiv, getOffset, removeClass } from "./utils";
+import { isString, addEvent, createDiv, getOffset, removeClass ,getCss} from "./utils";
 import { setglobalStyle } from "./styles";
 const hotboxClass = "hot-crop-box";
 import { SliceTypes } from "./types";
@@ -12,7 +12,7 @@ const createHotBox = () => {
   return createDiv({
     className: hotboxClass,
     cssText: `
-      width: 225px; height: 64px; display: none;background:blue;
+      width: 225px; height: 64px; display: none;background:#2aa7ff55;
     `,
   });
 };
@@ -25,7 +25,7 @@ class Slice<SliceTypes> extends EventEmitter {
   private addHotFlag = false;
   private dragPointFlag = false;
   private dragAreaFlag = false;
-  private currentHotBox: Element | null = null;
+  private currentHotBox: HTMLElement | null = null;
   private newHotBox: Element | null = null;
   private nowclipData: any = [];
   public cliplist: any = [];
@@ -44,6 +44,7 @@ class Slice<SliceTypes> extends EventEmitter {
     this.options = {
       flag: false, // 标记本次鼠标按下
       container: element,
+      scale: 1,
       ...options,
     };
     this.initDragArea();
@@ -71,7 +72,7 @@ class Slice<SliceTypes> extends EventEmitter {
     const usearea = getOffset(this.options.container);
     // 画布缩放大小
     const target = e.target;
-    const scale = this.options.scale || 1;
+    const scale = this.options.scale;
     const start = {
       x: e.clientX,
       y: e.clientY,
@@ -88,10 +89,86 @@ class Slice<SliceTypes> extends EventEmitter {
     // 拖动新建热区
     if (target.classList.contains("hot-area-img")) {
       this.addHotArea(target, start, usearea, scale);
+    }else if(this.getBoxContent(target)){
+      this.moveHotArea(target, start, usearea, scale)
     }
+    console.log(target)
     // this.mouseUp();
     addEvent(document, "mouseup", this.mouseUp.bind(this));
   }
+
+  private moveHotArea(target: HTMLElement, start: any, usearea: any, scale: number){
+    let drag = this.getBoxContent(target) as HTMLElement;
+    if(!drag.parentElement)return;
+    // 相对页面当前位置
+    let initPosition = getOffset(drag.parentElement);
+    // 相对container当前位置
+    let startPosition = {
+        x: drag.parentElement.style.left || getCss(drag.parentElement, "left"),
+        y: drag.parentElement.style.top || getCss(drag.parentElement, "top")
+    };
+    // let id = drag.parentElement.getAttribute("data-id");
+    // let selectActive = this.cliplist.find((item) => {
+    //     if (item.id == id) {
+    //         return item;
+    //     }
+    // });
+
+    startPosition.x = parseInt(startPosition.x) * scale;
+    startPosition.y = parseInt(startPosition.y) * scale;
+    document.onmousemove = (e) => {
+      if(!drag.parentElement)return;
+        // if (selectActive.locked) return;
+        drag.parentElement.style.background = "#2aa7ff55";
+        if (this.flag) {
+            // 拖动热区标签
+            this.dragAreaFlag = true;
+            this.currentHotBox = drag.parentElement;
+            // 移除其他框的active
+            this.removeOtherActive();
+            this.currentHotBox.classList.add("active");
+            const moveX = e.clientX - start.x;
+            const moveY = e.clientY - start.y;
+            console.log(moveX, moveY)
+            let result = {
+                x:
+                    parseInt(startPosition.x) + moveX > usearea.width - initPosition.width
+                        ? usearea.width - initPosition.width
+                        : parseInt(startPosition.x) + moveX < 0
+                        ? 0
+                        : parseInt(startPosition.x) + moveX,
+                y:
+                    parseInt(startPosition.y) + moveY > usearea.height - initPosition.height
+                        ? usearea.height - initPosition.height
+                        : parseInt(startPosition.y) + moveY < 0
+                        ? 0
+                        : parseInt(startPosition.y) + moveY
+            };
+            // selectActive.drag = true;
+            // selectActive.left = parseInt(result.x / scale) < 0 ? 0 : parseInt(result.x / scale);
+            // selectActive.top = parseInt(result.y / scale) < 0 ? 0 : parseInt(result.y / scale);
+            this.currentHotBox.style.left = Math.round(result.x / scale) + "px";
+            this.currentHotBox.style.top = Math.round(result.y / scale) + "px";
+        }
+    };
+  }
+
+  private getBoxContent (target:Element) {
+    let boxContent = null,
+        parent = target.parentNode as HTMLElement;
+    // 获取标记的拖动元素
+    if (target.classList.contains("crop-box-content")) {
+        boxContent = target;
+    }
+    while (parent && boxContent == null) {
+        if (parent.classList && parent.classList.contains("crop-box-content")) {
+            boxContent = parent;
+        } else {
+            parent = parent.parentNode as HTMLElement;
+        }
+    }
+    return boxContent;
+};
 
   private addHotArea(target: HTMLElement, start: any, usearea: any, scale: number) {
     // 鼠标在容器内的相对位置
@@ -235,7 +312,7 @@ class Slice<SliceTypes> extends EventEmitter {
       active.appendChild(
         createDiv({
           className: `cropper-point point-${item}`,
-          cssText: ``,
+          cssText: `--scale: ${1 / this.options.scale< 1 ? 1 : 1 / this.options.scale} `,
         })
       );
     });
