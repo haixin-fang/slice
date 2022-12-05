@@ -1,30 +1,18 @@
 import { EventEmitter } from "events";
 import { isString, addEvent, createDiv, getOffset, removeClass } from "./utils";
+import { setglobalStyle } from "./styles";
 const hotboxClass = "hot-crop-box";
 import { SliceTypes } from "./types";
-const createHotClass = (className: string) => {
+const createHotClass = (cssText:string) => {
   const style = document.createElement("style");
-  style.innerHTML = `.${className}{
-    bottom: 0;
-    left: 0;
-    position: absolute;
-    right: 0;
-    top: 0;
-    box-sizing: border-box;
-    direction: ltr;
-    font-size: 0;
-    line-height: 0;
-    touch-action: none;
-    user-select: none;
-  }`;
+  style.innerHTML = cssText;
   document.head.appendChild(style);
 };
 const createHotBox = () => {
-  createHotClass(hotboxClass);
   return createDiv({
     className: hotboxClass,
     cssText: `
-      width: 225px; height: 64px; display: none;border:1px solid red;
+      width: 225px; height: 64px; display: none;background:blue;
     `,
   });
 };
@@ -33,6 +21,7 @@ class Slice<SliceTypes> extends EventEmitter {
   private hotbox: Element = createHotBox();
   private boxIdx = 1;
   private start: any = null;
+  private flag = false;
   private addHotFlag = false;
   private dragPointFlag = false;
   private dragAreaFlag = false;
@@ -59,6 +48,11 @@ class Slice<SliceTypes> extends EventEmitter {
     };
     this.initDragArea();
     addEvent(element, "mousedown", this.dragStart.bind(this));
+    debugger;
+    if (!element.id) {
+      element.id = Math.random().toString(36).slice(2);
+    }
+    createHotClass(setglobalStyle(element.id));
     // element.appendChild(this.hotbox);
   }
   private initDragArea() {
@@ -82,7 +76,7 @@ class Slice<SliceTypes> extends EventEmitter {
       x: e.clientX,
       y: e.clientY,
     };
-    this.options.flag = true;
+    this.flag = true;
     // 禁止选择事件
     document.onselectstart = function () {
       return false;
@@ -110,7 +104,7 @@ class Slice<SliceTypes> extends EventEmitter {
     // 创建一个新热区
     this.newHotBox = this.hotbox.cloneNode(true) as HTMLElement;
     const newHotBox = this.newHotBox as HTMLElement;
-    const flag = this.options.flag;
+    const flag = this.flag;
     newHotBox.dataset["index"] = String(this.boxIdx);
     newHotBox.style.width = "0px";
     newHotBox.style.height = "0px";
@@ -205,12 +199,13 @@ class Slice<SliceTypes> extends EventEmitter {
         this.boxIdx++;
         this.nowclipData.drag = true;
         this.cliplist.push(this.nowclipData);
+        this.initDragPoint();
         // this.options.container.removeChild(newHotBox);
         // this.handler.initClipData(this.cliplist);
       }
     }
     console.log(this.cliplist);
-    this.options.flag = false;
+    this.flag = false;
     this.addHotFlag = false;
     this.dragAreaFlag = false;
     this.dragPointFlag = false;
@@ -223,11 +218,35 @@ class Slice<SliceTypes> extends EventEmitter {
     this.options.container.ondragstart = null;
   }
 
+  private initDragPoint() {
+    const active = this.options.container.querySelector(".hot-crop-box.active");
+    if (!active) return;
+    const scaleInfo = ["e", "n", "w", "s", "ne", "nw", "sw", "se"];
+    const cropBox = createDiv({
+      className: "crop-box-content",
+      cssText: `width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      opacity: 0.3;
+      cursor: move;`,
+    });
+    active.appendChild(cropBox);
+    scaleInfo.forEach(item => {
+      active.appendChild(
+        createDiv({
+          className: `cropper-point point-${item}`,
+          cssText: ``,
+        })
+      );
+    });
+  }
+
   private removeOtherActive = () => {
     this.cliplist.forEach((item: any) => {
       item.drag = false;
     });
     const active = this.options.container.querySelector(".hot-crop-box.active");
+
     active && removeClass(active, "active");
   };
 }
