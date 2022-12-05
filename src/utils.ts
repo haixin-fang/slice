@@ -17,3 +17,31 @@ export const createDiv = ({ className, cssText }: { className: string; cssText: 
   el.style.cssText = cssText;
   return el;
 };
+
+export const getScroll = function (scrollProp: any, offsetProp: any) {
+  if (typeof window[offsetProp] !== "undefined") {
+    return window[offsetProp];
+  }
+  if (document.documentElement.clientHeight) {
+    return document.documentElement[scrollProp];
+  }
+  return document.body[scrollProp];
+};
+export const getOffset = function (el: Element) {
+  const rect = el.getBoundingClientRect();
+  return {
+    left: rect.left + getScroll("scrollLeft", "pageXOffset"),
+    top: rect.top + getScroll("scrollTop", "pageYOffset"),
+    width: rect.right - rect.left,
+    height: rect.bottom - rect.top,
+  };
+};
+export function removeClass(element: Element, className: string) {
+  if (element.classList) {
+    element.classList.remove(className);
+  } else {
+    const reg = new RegExp(`(\\s|^)${className}(\\s|$)`);
+
+    element.className = element.className.replace(reg, " ");
+  }
+}

@@ -13,6 +13,7 @@
 		"skipLibCheck": false,
 		"strict": true,
 		"moduleResolution": "node",
+    "suppressImplicitAnyIndexErrors": true,
 		"lib": [
 			"es2015",
 			"dom"

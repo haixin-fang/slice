@@ -34,5 +34,9 @@ export interface SliceTypes {
   /**
    * 创建的新热区
    */
-  neeHotBox: Element | null;
+   newHotBox: Element | null;
+  /**
+   * 新建热区的临时数据
+   */
+  nowclipData: any;
 }
