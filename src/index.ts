@@ -2,7 +2,6 @@ import { EventEmitter } from "events";
 import { isString, addEvent, createDiv, getOffset, removeClass, getCss } from "./utils";
 import { setglobalStyle } from "./styles";
 const hotboxClass = "hot-crop-box";
-import { SliceTypes } from "./types";
 const createHotClass = (cssText: string) => {
   const style = document.createElement("style");
   style.innerHTML = cssText;
@@ -16,7 +15,7 @@ const createHotBox = () => {
     `,
   });
 };
-class Slice<SliceTypes> extends EventEmitter {
+class Slice extends EventEmitter {
   public options: any = {};
   private hotbox: Element = createHotBox();
   private boxIdx = 1;
