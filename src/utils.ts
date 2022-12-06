@@ -1,5 +1,7 @@
 const STRING = "string";
-
+interface isObject {
+  [key: string]: string;
+}
 export function isString(value: any): value is string {
   return typeof value === STRING;
 }
@@ -11,10 +13,23 @@ export function addEvent(
 ) {
   el.addEventListener(type, listener, options);
 }
-export const createDiv = ({ className, cssText }: { className: string; cssText: string }) => {
+export const createDiv = ({
+  className,
+  cssText,
+  attr,
+}: {
+  className: string;
+  cssText: string;
+  attr?: isObject;
+}) => {
   const el = globalThis.document.createElement("div");
   el.className = className;
   el.style.cssText = cssText;
+  if (attr) {
+    for (let key in attr) {
+      el.setAttribute(key, attr[key]);
+    }
+  }
   return el;
 };
 
@@ -46,6 +61,6 @@ export function removeClass(element: Element, className: string) {
   }
 }
 
-export const getCss = function (o:HTMLElement, key:string) {
-    return window.getComputedStyle(o, null)[key];
+export const getCss = function (o: HTMLElement, key: string) {
+  return window.getComputedStyle(o, null)[key];
 };
