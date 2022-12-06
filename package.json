@@ -16,9 +16,15 @@
     "prepublish": "npm version && npm run build",
     "prepare": "husky install",
     "commit": "git-cz",
-    "debug": "live-server demo/index.html"
+    "debug": "live-server"
   },
-  "keywords": [],
+  "keywords": [
+    "psd",
+    "ps",
+    "slice",
+    "starfish",
+    "drag"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {

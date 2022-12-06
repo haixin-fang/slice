@@ -338,7 +338,6 @@ class Slice extends EventEmitter {
         this.currentHotBox.classList.add("active");
         const moveX = e.clientX - start.x;
         const moveY = e.clientY - start.y;
-        console.log(moveX, moveY);
         let result = {
           x:
             parseInt(startPosition.x) + moveX > usearea.width - initPosition.width
@@ -489,6 +488,17 @@ class Slice extends EventEmitter {
         // this.options.container.removeChild(newHotBox);
         // this.handler.initClipData(this.cliplist);
       }
+    }
+    // 是否拖动热区
+    if (this.dragAreaFlag) {
+      if (this.currentHotBox) {
+        this.currentHotBox.style.background = "";
+      }
+    }
+
+    // 是否拖动缩放
+    if (this.dragPointFlag) {
+      console.log("缩放");
     }
     console.log(this.cliplist);
     this.flag = false;
