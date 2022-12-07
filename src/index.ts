@@ -25,11 +25,12 @@ class Slice extends EventEmitter {
   private dragAreaFlag = false;
   private currentHotBox: HTMLElement | null = null;
   private newHotBox: Element | null = null;
-  private nowclipData: any = [];
+  private nowclipData: any = {};
   public cliplist: any = [];
 
   constructor(target: Element | string, options: any) {
     super();
+    // console.log('uuid',uuidv4())
     let element: Element;
     if (isString(target)) {
       element = document.querySelector(target) as Element;
@@ -46,13 +47,12 @@ class Slice extends EventEmitter {
       ...options,
     };
     this.initDragArea();
-    addEvent(element, "mousedown", this.dragStart.bind(this));
-    debugger;
     if (!element.id) {
-      element.id = Math.random().toString(36).slice(2);
+      element.id = this.guid();
     }
     createHotClass(setglobalStyle(element.id));
-    // element.appendChild(this.hotbox);
+    addEvent(element, "mousedown", this.dragStart.bind(this));
+    addEvent(document, "mouseup", this.mouseUp.bind(this));
   }
   private initDragArea() {
     const dragArea = createDiv({
@@ -64,7 +64,7 @@ class Slice extends EventEmitter {
   }
 
   public dragStart(e: any) {
-    this.nowclipData = [];
+    this.nowclipData = {};
     e.stopImmediatePropagation();
     // 获取可拖动的范围
     const usearea = getOffset(this.options.container);
@@ -92,9 +92,19 @@ class Slice extends EventEmitter {
     } else if (target.classList.contains("cropper-point")) {
       this.moveCropperPoint(target, start, usearea, scale);
     }
-    console.log(target);
     // this.mouseUp();
-    addEvent(document, "mouseup", this.mouseUp.bind(this));
+  }
+
+  private guid() {
+    let guid =
+      Math.random().toString(32).slice(2, 8) +
+      "-" +
+      Math.random().toString(32).slice(2, 8) +
+      "-" +
+      Math.random().toString(32).slice(2, 8) +
+      "-" +
+      Math.random().toString(32).slice(2, 8);
+    return guid;
   }
 
   private moveCropperPoint(target: HTMLElement, start: any, usearea: any, scale: number) {
@@ -138,12 +148,6 @@ class Slice extends EventEmitter {
         };
         moveArea.x = moveArea.x / scale;
         moveArea.y = moveArea.y / scale;
-        // console.log("------");
-        // console.log("start", start);
-        // console.log("client", { x: e.clientX, y: e.clientY });
-        // console.log("moveArea", moveArea);
-        // console.log("usearea", usearea);
-        // console.log("------");
         const { width, height } = this.options.container;
         if (initAttr.direct == "e") {
           let nowW =
@@ -406,6 +410,8 @@ class Slice extends EventEmitter {
         this.addHotFlag = true;
         // 显示热区
         newHotBox.style.display = "block";
+        const id = this.guid();
+        newHotBox.setAttribute("data-id", id);
         // 移除其他框的active
         this.removeOtherActive();
         newHotBox.classList.add("active");
@@ -461,6 +467,7 @@ class Slice extends EventEmitter {
         newHotBox.style.left = Math.round(left) + "px";
         newHotBox.style.top = Math.round(top) + "px";
         Object.assign(this.nowclipData, {
+          id,
           width,
           height,
           locked: false,
@@ -471,7 +478,7 @@ class Slice extends EventEmitter {
     };
   }
 
-  private mouseUp() {
+  private mouseUp(e: any) {
     if (this.addHotFlag) {
       const newHotBox = this.newHotBox as HTMLElement;
       // 20可以通过陪参传入
@@ -485,6 +492,11 @@ class Slice extends EventEmitter {
         this.nowclipData.drag = true;
         this.cliplist.push(this.nowclipData);
         this.initDragPoint();
+        this.emit("add", {
+          add: this.nowclipData,
+          cliplist: this.cliplist,
+          e,
+        });
         // this.options.container.removeChild(newHotBox);
         // this.handler.initClipData(this.cliplist);
       }
@@ -499,6 +511,9 @@ class Slice extends EventEmitter {
     // 是否拖动缩放
     if (this.dragPointFlag) {
       console.log("缩放");
+      this.emit("scale", {
+        status: "end",
+      });
     }
     console.log(this.cliplist);
     this.flag = false;
